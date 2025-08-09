@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Repository
 public class UserMongoAdapter implements UserRepositoryPort {
 
     private final ReactiveMongoUserRepository mongoRepository;
@@ -13,7 +14,6 @@ public class UserMongoAdapter implements UserRepositoryPort {
     public UserMongoAdapter(ReactiveMongoUserRepository mongoRepository) {
         this.mongoRepository = mongoRepository;
     }
-
 
     @Override
     public Flux<User> findAll() {
@@ -27,8 +27,7 @@ public class UserMongoAdapter implements UserRepositoryPort {
 
     @Override
     public Mono<User> save(User user) {
-        MongoUserEntity entity = toEntity(user);
-        return mongoRepository.save(entity).map(this::toDomainModel);
+        return mongoRepository.save(toEntity(user)).map(this::toDomainModel);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class UserMongoAdapter implements UserRepositoryPort {
         return mongoRepository.deleteById(id);
     }
 
-
+    // --- Mapeadores ---
     private User toDomainModel(MongoUserEntity entity) {
         return new User(entity.id(), entity.username(), entity.email());
     }
